@@ -1,0 +1,40 @@
+# commands to specify testing environments
+language: python
+matrix:
+  include:
+    - python: 3.5
+    - python: 3.6
+    - python: 3.7
+      dist: xenial
+      sudo: true
+    - python: 3.8-dev
+      dist: xenial
+      sudo: true
+    - python: nightly
+      dist: xenial
+      sudo: true
+  allow_failures:
+    - python: 3.8-dev
+    - python: nightly
+
+# command to install dependencies
+install:
+  - pip install -r test-requirements.txt
+
+# command to run tests
+script:
+  # modified discover to handle namespace package
+  python -m unittest discover -s samplelib/test/ -p '*_test.py'
+  python -m unittest discover -s nionswift_plugin/sample/test/ -p '*_test.py'
+
+# command to deploy to pypi on tags
+deploy:
+  provider: pypi
+  user: "your_user_name"
+  password:
+    secure: "your_secure_password"  # see https://docs.travis-ci.com/user/deployment/pypi/
+  on:
+    tags: true
+    python: '3.6'
+    branch: master
+  distributions: "sdist bdist_wheel" # Your distributions here
